@@ -14,11 +14,6 @@ type mysqlUserRepository struct {
 	DB *sql.DB
 }
 
-// NewMysqlArticleRepository will create an object that represent the article.Repository interface
-// func NewMysqlArticleRepository(Conn *sql.DB) u.Repository {
-// 	return &mysqlArticleRepository{Conn}
-// }
-
 func NewMysqlUserRepository(db *sql.DB) user.Repository {
 	return &mysqlUserRepository{
 		DB: db,
@@ -94,7 +89,3 @@ func (m *mysqlUserRepository) UpdateProfileImage(ctx context.Context, id int64, 
 	}
 	return nil
 }
-
-// func (m *mysqlUserRepository) RemoveProfileImage(ctx context.Context) error {
-
-// }

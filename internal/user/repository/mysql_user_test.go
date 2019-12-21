@@ -12,7 +12,7 @@ import (
 	"gopkg.in/guregu/null.v3"
 )
 
-func TestStoreSuccess(t *testing.T) {
+func TestStoreSuccessMysql(t *testing.T) {
 	// Creates sqlmock database connection and a mock to manage expectations.
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -37,7 +37,7 @@ func TestStoreSuccess(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestStoreFailedPrepare(t *testing.T) {
+func TestStoreFailedPrepareMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -51,7 +51,7 @@ func TestStoreFailedPrepare(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestStoreFailed(t *testing.T) {
+func TestStoreFailedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -72,7 +72,7 @@ func TestStoreFailed(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestGetByIDSuccess(t *testing.T) {
+func TestGetByIDSuccessMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -91,7 +91,7 @@ func TestGetByIDSuccess(t *testing.T) {
 	assert.Equal(t, user.ID, int64(1))
 }
 
-func TestGetByIDFailed(t *testing.T) {
+func TestGetByIDFailedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -104,7 +104,7 @@ func TestGetByIDFailed(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestGetByUsernameSuccess(t *testing.T) {
+func TestGetByUsernameSuccessMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -123,7 +123,7 @@ func TestGetByUsernameSuccess(t *testing.T) {
 	assert.Equal(t, user.ID, int64(1))
 }
 
-func TestGetByUsernameFailed(t *testing.T) {
+func TestGetByUsernameFailedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -138,7 +138,7 @@ func TestGetByUsernameFailed(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdateNicknameSuccess(t *testing.T) {
+func TestUpdateNicknameSuccessMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -156,7 +156,7 @@ func TestUpdateNicknameSuccess(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestUpdateNicknameFailedPrepare(t *testing.T) {
+func TestUpdateNicknameFailedPrepareMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -170,7 +170,7 @@ func TestUpdateNicknameFailedPrepare(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdateNickNameFailed(t *testing.T) {
+func TestUpdateNickNameFailedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -185,7 +185,7 @@ func TestUpdateNickNameFailed(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdateProfileImageSuccess(t *testing.T) {
+func TestUpdateProfileImageSuccessMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -203,7 +203,7 @@ func TestUpdateProfileImageSuccess(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestUpdateProfileImageFailedPrepared(t *testing.T) {
+func TestUpdateProfileImageFailedPreparedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -218,7 +218,7 @@ func TestUpdateProfileImageFailedPrepared(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestUpdateProfileImageFailed(t *testing.T) {
+func TestUpdateProfileImageFailedMysql(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
