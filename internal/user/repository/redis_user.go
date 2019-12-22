@@ -13,14 +13,24 @@ import (
 )
 
 type redisUserRepository struct {
-	Redis redis.Conn
+	// Redis redis.Conn
+	RedisPool *redis.Pool
 }
 
-func NewRedisUserRepository(conn redis.Conn) user.Repository {
+// func NewRedisUserRepository(conn redis.Conn) user.Repository {
+// 	return &redisUserRepository{
+// 		Redis: conn,
+// 	}
+// }
+
+func NewRedisUserRepository(redisPool *redis.Pool) user.Repository {
 	return &redisUserRepository{
-		Redis: conn,
+		RedisPool: redisPool,
 	}
 }
+
+// func NewRedisUer
+// *redis.Pool
 
 func (r *redisUserRepository) Store(ctx context.Context, user *models.User) error {
 	// serialize user object
@@ -31,7 +41,10 @@ func (r *redisUserRepository) Store(ctx context.Context, user *models.User) erro
 	}
 	// SET object
 	// log.Println("json dari user:", string(json))
-	_, err = r.Redis.Do("SET", strconv.Itoa(int(user.ID)), string(json))
+	conn := r.RedisPool.Get()
+	defer conn.Close()
+	// _, err = r.Redis.Do("SET", strconv.Itoa(int(user.ID)), string(json))
+	_, err = conn.Do("SET", strconv.Itoa(int(user.ID)), string(json))
 	if err != nil {
 		// log.Println("SetUserToCache error set to redis", err.Error())
 		return err
@@ -40,7 +53,11 @@ func (r *redisUserRepository) Store(ctx context.Context, user *models.User) erro
 }
 
 func (r *redisUserRepository) GetByID(ctx context.Context, id int64) (*models.User, error) {
-	user_temp, err := redis.String(r.Redis.Do("GET", strconv.Itoa(int(id))))
+	conn := r.RedisPool.Get()
+	defer conn.Close()
+
+	// user_temp, err := redis.String(r.Redis.Do("GET", strconv.Itoa(int(id))))
+	user_temp, err := redis.String(conn.Do("GET", strconv.Itoa(int(id))))
 	// log.Println("user_temp:", user_temp)
 
 	if err != nil {

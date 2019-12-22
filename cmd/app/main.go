@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_userHttpDeliver "github.com/famkampm/nentrytask/internal/user/delivery/http"
 	"github.com/famkampm/nentrytask/internal/user/repository"
@@ -31,13 +32,14 @@ func main() {
 		closeDB(db)
 		log.Println("CLOSING DB CON")
 	}()
-	conn := initRedis()
-	defer func() {
-		log.Println("closing redis conection")
-		conn.Close()
-	}()
+	// conn := initRedis()
+	// defer func() {
+	// 	log.Println("closing redis conection")
+	// 	conn.Close()
+	// }()
+	redisPool := initRedisPool()
 	userRepoMysql := repository.NewMysqlUserRepository(db)
-	userRepoRedis := repository.NewRedisUserRepository(conn)
+	userRepoRedis := repository.NewRedisUserRepository(redisPool)
 	userUsecase := usecase.NewUserUsecase(userRepoMysql, userRepoRedis)
 	router := httprouter.New()
 
@@ -125,11 +127,24 @@ func closeDB(db *sql.DB) {
 }
 
 func initRedis() redis.Conn {
-	conn, err := redis.Dial("tcp", "localhost:6379")
+	conn, err := redis.Dial("tcp", "127.0.0.1:6379")
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Importantly, use defer to ensure the connection is always
 	// properly closed before exiting the main() function.
 	return conn
+}
+
+func initRedisPool() *redis.Pool {
+
+	pool := &redis.Pool{
+		MaxIdle:     80,
+		MaxActive:   12000,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp", "127.0.0.1:6379")
+		},
+	}
+	return pool
 }

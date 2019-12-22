@@ -22,13 +22,13 @@ func NewUserUsecase(mysql user.Repository, redis user.Repository) user.Usecase {
 
 func (u *userUsecase) Store(ctx context.Context, user *models.User) error {
 	// THE PRIORITY IS TO STORE TO MYSQL FIRST. AND THEN STORE TO REDIS IF NECESSARY
-	// err := u.userRepoMysql.Store(ctx, user)
-	// if err != nil {
-	// 	log.Println("errror storing to mysql from user usecase.err:", err.Error())
-	// 	return err
-	// }
+	err := u.userRepoMysql.Store(ctx, user)
+	if err != nil {
+		log.Println("errror storing to mysql from user usecase.err:", err.Error())
+		return err
+	}
 	// IF ERROR WHEN STORING TO REDIS, IT DOESN'T REALLY MATTER. SO NO ERROR. JUST LOG
-	err := u.userRepoRedis.Store(ctx, user)
+	err = u.userRepoRedis.Store(ctx, user)
 	if err != nil {
 		log.Println("errror storing to redis from user usecase.err:", err.Error())
 	}
@@ -37,13 +37,14 @@ func (u *userUsecase) Store(ctx context.Context, user *models.User) error {
 
 func (u *userUsecase) GetByID(ctx context.Context, id int64) (*models.User, error) {
 	// GET FROM REDIS FIRST. IF NOT EXIST. GET TO DB
-	// user, err := u.userRepoRedis.GetByID(ctx, id)
-	// if err != nil {
-	// 	log.Println("usecase GET BY ID FROM REDIS err:", err.Error())
-	// } else {
-	// 	return user, nil
-	// }
-	user, err := u.userRepoMysql.GetByID(ctx, id)
+	user, err := u.userRepoRedis.GetByID(ctx, id)
+	if err != nil {
+		log.Println("usecase GET BY ID FROM REDIS err:", err.Error())
+	} else {
+		// log.Println("ngambil dari redis id ni")
+		return user, nil
+	}
+	user, err = u.userRepoMysql.GetByID(ctx, id)
 	if err != nil {
 		log.Println("usecase get by id from mysql err:", err.Error())
 		return &models.User{}, err

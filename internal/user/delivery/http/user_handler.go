@@ -56,8 +56,7 @@ func (u *UserHandler) Store(w http.ResponseWriter, r *http.Request, _ httprouter
 		responses.ERROR(w, http.StatusUnprocessableEntity, formatedError)
 		return
 	}
-	log.Println("store 1")
-	// defer r.Body.Close()
+	defer r.Body.Close()
 	user := &models.User{}
 	err = json.Unmarshal(body, user)
 	if err != nil {
@@ -65,7 +64,6 @@ func (u *UserHandler) Store(w http.ResponseWriter, r *http.Request, _ httprouter
 		responses.ERROR(w, http.StatusUnprocessableEntity, formatedError)
 		return
 	}
-	log.Println("store 2")
 
 	err = helper.Validate("register", user.Username, user.Password)
 	if err != nil {
@@ -73,7 +71,6 @@ func (u *UserHandler) Store(w http.ResponseWriter, r *http.Request, _ httprouter
 		responses.ERROR(w, http.StatusUnprocessableEntity, formatedError)
 		return
 	}
-	log.Println("store 3")
 
 	_, err = u.UserUsecase.GetByUsername(context.TODO(), user.Username)
 	if err != nil && err != sql.ErrNoRows {
@@ -81,20 +78,17 @@ func (u *UserHandler) Store(w http.ResponseWriter, r *http.Request, _ httprouter
 		responses.ERROR(w, http.StatusInternalServerError, formatedError)
 		return
 	}
-	log.Println("store 4")
 	if err == nil {
 		formatedError := helper.FormatError("username already exist")
 		responses.ERROR(w, http.StatusBadRequest, formatedError)
 		return
 	}
-	log.Println("store 5")
 	hashedPassword, err := helper.HashingPassword(user.Password)
 	if err != nil {
 		formatedError := helper.FormatError(err.Error())
 		responses.ERROR(w, http.StatusInternalServerError, formatedError)
 		return
 	}
-	log.Println("store 6")
 	user.Password = hashedPassword
 	err = u.UserUsecase.Store(context.TODO(), user)
 	if err != nil {
@@ -102,7 +96,6 @@ func (u *UserHandler) Store(w http.ResponseWriter, r *http.Request, _ httprouter
 		responses.ERROR(w, http.StatusInternalServerError, formatedError)
 		return
 	}
-	log.Println("store 7")
 	w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, user.ID))
 	userProfile := &models.UserProfile{}
 	userProfile.ID = user.ID
