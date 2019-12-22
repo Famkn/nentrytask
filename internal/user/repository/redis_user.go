@@ -62,7 +62,7 @@ func (r *redisUserRepository) GetByUsername(ctx context.Context, username string
 }
 
 func (r *redisUserRepository) UpdateNickname(ctx context.Context, id int64, nickname string) error {
-	log.Println("update nickname caled")
+	// log.Println("update nickname caled")
 	user, err := r.GetByID(ctx, id)
 	if err != nil {
 		log.Println("update nickname getbyid err:", err.Error())

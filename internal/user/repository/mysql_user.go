@@ -83,7 +83,7 @@ func (m *mysqlUserRepository) UpdateProfileImage(ctx context.Context, id int64, 
 
 		return err
 	}
-	_, err = stmt.ExecContext(ctx, id, null.StringFrom(profile_image))
+	_, err = stmt.ExecContext(ctx, null.StringFrom(profile_image), id)
 	if err != nil {
 		return err
 	}

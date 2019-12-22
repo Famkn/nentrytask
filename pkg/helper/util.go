@@ -1,7 +1,11 @@
 package helper
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -50,4 +54,24 @@ func FormatError(err string) error {
 	}
 
 	return errors.New("Incorrect Details")
+}
+
+func RemovePicture(profile_image string) error {
+	if profile_image == "" {
+		return nil
+	}
+	path := os.Getenv("IMAGE_PATH") + profile_image
+	// log.Println("PATH TO REMOVE PICT:", path)
+	err := os.Remove(path)
+	if err != nil {
+		log.Println("os remove err", err.Error())
+		return err
+	}
+	return nil
+}
+
+func RandToken(len int) string {
+	b := make([]byte, len)
+	rand.Read(b)
+	return fmt.Sprintf("%x", b)
 }
