@@ -34,3 +34,20 @@ func Validate(action, username, password string) error {
 	}
 	return nil
 }
+
+func FormatError(err string) error {
+
+	if strings.Contains(err, "username") {
+		return errors.New("Username Already Taken")
+	}
+
+	if strings.Contains(err, "hashedPassword") {
+		return errors.New("Incorrect Password")
+	}
+
+	if strings.Contains(err, "no rows") {
+		return errors.New("User not exist")
+	}
+
+	return errors.New("Incorrect Details")
+}

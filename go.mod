@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/alicebob/miniredis/v2 v2.11.1
 	github.com/davecgh/go-spew v1.1.1
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/famkampm/entrytask v0.0.0-20191219154034-80c3afdbc8ea
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/go-redis/redis/v7 v7.0.0-beta.4 // indirect
