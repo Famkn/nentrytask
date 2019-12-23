@@ -9,14 +9,16 @@ import (
 )
 
 type userUsecase struct {
-	userRepoMysql user.Repository
-	userRepoRedis user.Repository
+	userRepoMysql  user.Repository
+	userRepoRedis  user.Repository
+	userRepoMemory user.Repository
 }
 
-func NewUserUsecase(mysql user.Repository, redis user.Repository) user.Usecase {
+func NewUserUsecase(mysql user.Repository, redis user.Repository, memory user.Repository) user.Usecase {
 	return &userUsecase{
-		userRepoMysql: mysql,
-		userRepoRedis: redis,
+		userRepoMysql:  mysql,
+		userRepoRedis:  redis,
+		userRepoMemory: memory,
 	}
 }
 
@@ -32,6 +34,11 @@ func (u *userUsecase) Store(ctx context.Context, user *models.User) error {
 	if err != nil {
 		log.Println("errror storing to redis from user usecase.err:", err.Error())
 	}
+	// err = u.userRepoMemory.Store(ctx, user)
+	// if err != nil {
+	// 	log.Println("errror storing to memory from user usecase.err:", err.Error())
+	// 	return err
+	// }
 	return nil
 }
 
@@ -44,11 +51,22 @@ func (u *userUsecase) GetByID(ctx context.Context, id int64) (*models.User, erro
 		// log.Println("ngambil dari redis id ni")
 		return user, nil
 	}
+
+	// user, err = u.userRepoMemory.GetByID(ctx, id)
+	// if err != nil {
+	// 	log.Println("usecase GET BY ID FROM memory err:", err.Error())
+	// 	// return &models.User{}, err
+	// } else {
+	// 	// log.Println("ngambil dari memory id ni:", user.ID, user.Username)
+	// 	return user, nil
+	// }
+
 	user, err = u.userRepoMysql.GetByID(ctx, id)
 	if err != nil {
 		log.Println("usecase get by id from mysql err:", err.Error())
 		return &models.User{}, err
 	}
+
 	return user, nil
 }
 
@@ -58,14 +76,19 @@ func (u *userUsecase) GetByUsername(ctx context.Context, username string) (*mode
 
 func (u *userUsecase) UpdateNickname(ctx context.Context, id int64, nickname string) error {
 	// UPDATE MUST APPLY TO BOTH REDIS AND MYSQL
-	err := u.userRepoRedis.UpdateNickname(ctx, id, nickname)
-	if err != nil {
-		log.Println("usecase failed to update nickname redis repo:", err.Error())
-		return err
-	}
-	err = u.userRepoMysql.UpdateNickname(ctx, id, nickname)
+	// err = u.userRepoMemory.UpdateNickname(ctx, id, nickname)
+	// if err != nil {
+	// 	log.Println("usecase failed to update nickname memory repo:", err.Error())
+	// 	return err
+	// }
+	err := u.userRepoMysql.UpdateNickname(ctx, id, nickname)
 	if err != nil {
 		log.Println("usecase failed to update nickname mysql repo:", err.Error())
+		return err
+	}
+	err = u.userRepoRedis.UpdateNickname(ctx, id, nickname)
+	if err != nil {
+		log.Println("usecase failed to update nickname redis repo:", err.Error())
 		return err
 	}
 	return nil
@@ -73,14 +96,20 @@ func (u *userUsecase) UpdateNickname(ctx context.Context, id int64, nickname str
 
 func (u *userUsecase) UpdateProfileImage(ctx context.Context, id int64, profile_image string) error {
 	// UPDATE MUST APPLY TO BOTH REDIS AND MYSQL
-	err := u.userRepoRedis.UpdateProfileImage(ctx, id, profile_image)
-	if err != nil {
-		log.Println("usecase failed to update profile image redis repo:", err.Error())
-		return err
-	}
-	err = u.userRepoMysql.UpdateProfileImage(ctx, id, profile_image)
+	// err = u.userRepoMemory.UpdateProfileImage(ctx, id, profile_image)
+	// if err != nil {
+	// 	log.Println("usecase failed to update profile image memory repo:", err.Error())
+	// 	return err
+	// }
+
+	err := u.userRepoMysql.UpdateProfileImage(ctx, id, profile_image)
 	if err != nil {
 		log.Println("usecase failed to update profile image mysql repo:", err.Error())
+		return err
+	}
+	err = u.userRepoRedis.UpdateProfileImage(ctx, id, profile_image)
+	if err != nil {
+		log.Println("usecase failed to update profile image redis repo:", err.Error())
 		return err
 	}
 	return nil
@@ -96,5 +125,4 @@ func (u *userUsecase) ValidateUserPassword(ctx context.Context, username, passwo
 		return &models.User{}, err
 	}
 	return user, nil
-
 }

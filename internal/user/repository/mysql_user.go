@@ -28,6 +28,7 @@ func (m *mysqlUserRepository) Store(ctx context.Context, user *models.User) erro
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 	res, err := stmt.ExecContext(ctx, user.Username, user.Password, user.Nickname, user.ProfileImage)
 	if err != nil {
 		return err
@@ -68,6 +69,7 @@ func (m *mysqlUserRepository) UpdateNickname(ctx context.Context, id int64, nick
 		log.Println("prepared failed:", err.Error())
 		return err
 	}
+	defer stmt.Close()
 	_, err = stmt.ExecContext(ctx, null.StringFrom(nickname), id)
 	if err != nil {
 		log.Println("exec failed", err.Error())
@@ -83,6 +85,7 @@ func (m *mysqlUserRepository) UpdateProfileImage(ctx context.Context, id int64, 
 
 		return err
 	}
+	defer stmt.Close()
 	_, err = stmt.ExecContext(ctx, null.StringFrom(profile_image), id)
 	if err != nil {
 		return err

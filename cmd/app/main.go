@@ -32,15 +32,19 @@ func main() {
 		closeDB(db)
 		log.Println("CLOSING DB CON")
 	}()
+	db.SetMaxOpenConns(0)
+	db.SetMaxIdleConns(20)
 	// conn := initRedis()
 	// defer func() {
 	// 	log.Println("closing redis conection")
 	// 	conn.Close()
 	// }()
+	map_memory := make(map[int64]string)
 	redisPool := initRedisPool()
 	userRepoMysql := repository.NewMysqlUserRepository(db)
 	userRepoRedis := repository.NewRedisUserRepository(redisPool)
-	userUsecase := usecase.NewUserUsecase(userRepoMysql, userRepoRedis)
+	userRepoMemory := repository.NewMemoryUserRepository(map_memory)
+	userUsecase := usecase.NewUserUsecase(userRepoMysql, userRepoRedis, userRepoMemory)
 	router := httprouter.New()
 
 	_userHttpDeliver.NewUserHandler(router, userUsecase)
@@ -108,13 +112,17 @@ func initDB() *sql.DB {
 	err = db.Ping()
 	if err != nil {
 		log.Println("DB PING ERROR:", err.Error())
+		db.Close()
 		panic(err.Error())
 	}
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS user ( id int not null AUTO_INCREMENT, username varchar(240) not null, password varchar(240) not null, nickname varchar(240), profile_image varchar(240), PRIMARY KEY (id) )")
-	if err != nil {
-		log.Println("CREATE TABLE USER err:", err.Error())
-		panic(err.Error())
-	}
+	// _, err = db.Exec("CREATE TABLE IF NOT EXISTS user ( id int not null AUTO_INCREMENT, username varchar(240) not null, password varchar(240) not null, nickname varchar(240), profile_image varchar(240), PRIMARY KEY (id) )")
+	// if err != nil {
+	// 	log.Println("CREATE TABLE USER err:", err.Error())
+	// 	panic(err.Error())
+	// }
+	db.SetMaxOpenConns(400)
+	// db.DB().SetMaxOpenConns(10)
+
 	return db
 }
 
@@ -139,8 +147,8 @@ func initRedis() redis.Conn {
 func initRedisPool() *redis.Pool {
 
 	pool := &redis.Pool{
-		MaxIdle:     80,
-		MaxActive:   12000,
+		MaxIdle:     500,
+		MaxActive:   500,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
 			return redis.Dial("tcp", "127.0.0.1:6379")
